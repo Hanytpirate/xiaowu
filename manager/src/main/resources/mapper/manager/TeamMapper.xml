@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.manager.mapper.TeamMapper">
+    
+    <resultMap type="Team" id="TeamResult">
+        <result property="teamId"    column="team_id"    />
+        <result property="leaderUid"    column="leader_uid"    />
+        <result property="teamName"    column="team_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectTeamVo">
+        select team_id, leader_uid, team_name, create_time, remark from xiaowu_team
+    </sql>
+
+    <select id="selectTeamList" parameterType="Team" resultMap="TeamResult">
+        <include refid="selectTeamVo"/>
+        <where>  
+            <if test="teamId != null "> and team_id = #{teamId}</if>
+            <if test="leaderUid != null "> and leader_uid = #{leaderUid}</if>
+            <if test="teamName != null  and teamName != ''"> and team_name like concat('%', #{teamName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectTeamByTeamId" parameterType="Long" resultMap="TeamResult">
+        <include refid="selectTeamVo"/>
+        where team_id = #{teamId}
+    </select>
+
+    <insert id="insertTeam" parameterType="Team" useGeneratedKeys="true" keyProperty="teamId">
+        insert into xiaowu_team
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="leaderUid != null">leader_uid,</if>
+            <if test="teamName != null">team_name,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="leaderUid != null">#{leaderUid},</if>
+            <if test="teamName != null">#{teamName},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTeam" parameterType="Team">
+        update xiaowu_team
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="leaderUid != null">leader_uid = #{leaderUid},</if>
+            <if test="teamName != null">team_name = #{teamName},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where team_id = #{teamId}
+    </update>
+
+    <delete id="deleteTeamByTeamId" parameterType="Long">
+        delete from xiaowu_team where team_id = #{teamId}
+    </delete>
+
+    <delete id="deleteTeamByTeamIds" parameterType="String">
+        delete from xiaowu_team where team_id in 
+        <foreach item="teamId" collection="array" open="(" separator="," close=")">
+            #{teamId}
+        </foreach>
+    </delete>
+</mapper>

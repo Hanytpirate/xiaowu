@@ -233,6 +233,8 @@
         <module>ruoyi-modules</module>
         <module>ruoyi-api</module>
         <module>ruoyi-common</module>
+        <module>manager</module>
+        <module>manager</module>
     </modules>
     <packaging>pom</packaging>
 

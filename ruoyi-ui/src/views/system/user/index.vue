@@ -269,6 +269,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="岗位">
+              <!--      postOptions:所有岗位 postIds:该用户绑定的岗位        -->
               <el-select v-model="form.postIds" multiple placeholder="请选择岗位">
                 <el-option
                   v-for="item in postOptions"

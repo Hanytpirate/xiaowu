@@ -10,7 +10,7 @@ export function listUser(query) {
   })
 }
 
-// 查询用户详细
+// 查询用户详细信息 getInfo
 export function getUser(userId) {
   return request({
     url: '/system/user/' + parseStrEmpty(userId),
