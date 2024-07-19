@@ -95,7 +95,7 @@ export function authUserCancel(data) {
 // 批量取消用户授权角色
 export function authUserCancelAll(data) {
   return request({
-    url: '/system/role/authUser/cancelAll',
+    url: '/system/team/authUser/cancelAll',
     method: 'put',
     params: data
   })

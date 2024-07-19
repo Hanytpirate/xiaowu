@@ -1,22 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="团队id" prop="teamId">
-        <el-input
-          v-model="queryParams.teamId"
-          placeholder="请输入团队id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="项目经理的uid" prop="leaderUid">
-        <el-input
-          v-model="queryParams.leaderUid"
-          placeholder="请输入项目经理的uid"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+    <el-form @submit.native.prevent :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="团队名称" prop="teamName">
         <el-input
           v-model="queryParams.teamName"
@@ -64,23 +48,12 @@
           v-hasPermi="['manager:team:remove']"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['manager:team:export']"
-        >导出</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="teamList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="团队id" align="center" prop="teamId" />
-      <el-table-column label="项目经理的uid" align="center" prop="leaderUid" />
       <el-table-column label="团队名称" align="center" prop="teamName" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -99,6 +72,14 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['manager:team:remove']"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-user"
+            @click="handleAddUser(scope.row)"
+            v-hasPermi="['manager:team:edit']"
+          >加入成员</el-button>
+
         </template>
       </el-table-column>
     </el-table>
@@ -114,36 +95,9 @@
     <!-- 添加或修改团队管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="项目经理的uid" prop="leaderUid">
-          <el-input v-model="form.leaderUid" placeholder="请输入项目经理的uid" />
-        </el-form-item>
         <el-form-item label="团队名称" prop="teamName">
           <el-input v-model="form.teamName" placeholder="请输入团队名称" />
         </el-form-item>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="团队成员">
-              <el-select
-                v-model="value"
-                multiple
-                filterable
-                remote
-                reserve-keyword
-                placeholder="请输入用户名"
-                :remote-method="remoteMethod"
-                :loading="loading"
-                style="width: 240px"
-              >
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
         </el-form-item>
@@ -153,6 +107,7 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+    <select-user ref="select"></select-user>
   </div>
 </template>
 
@@ -160,9 +115,11 @@
 import { listTeam, getTeam, delTeam, addTeam, updateTeam } from "@/api/manager/team";
 import { listUser } from "@/api/system/user";
 import loading from 'quill/blots/break'
+import selectUser from '@/views/system/role/selectUser.vue'
 
 export default {
   name: "Team",
+  components: { selectUser },
   data() {
     return {
       // 遮罩层
@@ -182,7 +139,7 @@ export default {
       // 弹出层标题
       title: "",
       // 用户选项
-      options: ["韩雨田","李超然"],
+      options: [],
       // 是否显示弹出层
       open: false,
       // 查询参数
@@ -261,20 +218,11 @@ export default {
         this.title = "修改团队管理";
       });
     },
-    /** 每次搜索的时候 */
-    remoteMethod(query){
-      if (query) {
-        loading.value = true
-        setTimeout(() => {
-          loading.value = false
-          options.value = list.value.filter((item) => {
-            return item.label.toLowerCase().includes(query.toLowerCase())
-          })
-        }, 200)
-      } else {
-        options.value = []
-      }
-    },    /** 提交按钮 */
+
+    handleAddUser: function(row) {
+      const teamId = row.teamId;
+      this.$router.push("/system/team-assign/user/" + teamId);
+    }, /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
@@ -303,12 +251,6 @@ export default {
         this.getList();
         this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      this.download('manager/team/export', {
-        ...this.queryParams
-      }, `team_${new Date().getTime()}.xlsx`)
     }
   }
 };

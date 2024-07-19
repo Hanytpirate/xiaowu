@@ -1,30 +1,28 @@
-package com.ruoyi.manager.controller;
+package com.ruoyi.system.controller;
 
-import java.util.List;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.ruoyi.common.core.utils.poi.ExcelUtil;
+import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.core.web.domain.AjaxResult;
+import com.ruoyi.common.core.web.page.TableDataInfo;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
-import com.ruoyi.manager.domain.Team;
-import com.ruoyi.manager.service.ITeamService;
-import com.ruoyi.common.core.web.controller.BaseController;
-import com.ruoyi.common.core.web.domain.AjaxResult;
-import com.ruoyi.common.core.utils.poi.ExcelUtil;
-import com.ruoyi.common.core.web.page.TableDataInfo;
+
+import com.ruoyi.system.api.domain.SysUser;
+import com.ruoyi.system.api.domain.Team;
+import com.ruoyi.system.domain.SysUserRole;
+import com.ruoyi.system.domain.TeamUser;
+import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.system.service.ITeamService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 团队管理Controller
- * 
+ *
  * @author hanyt
  * @date 2024-07-03
  */
@@ -35,6 +33,8 @@ public class TeamController extends BaseController
     @Autowired
     private ITeamService teamService;
 
+    @Autowired
+    private ISysUserService userService;
     /**
      * 查询团队管理列表
      */
@@ -46,7 +46,6 @@ public class TeamController extends BaseController
         List<Team> list = teamService.selectTeamList(team);
         return getDataTable(list);
     }
-
     /**
      * 导出团队管理列表
      */
@@ -101,5 +100,42 @@ public class TeamController extends BaseController
     public AjaxResult remove(@PathVariable Long[] teamIds)
     {
         return toAjax(teamService.deleteTeamByTeamIds(teamIds));
+    }
+
+    @RequiresPermissions("manager:team:query")
+    @GetMapping("/assignUser/{teamId}")
+    public TableDataInfo assignUser(SysUser user,@PathVariable("teamId") Long teamId){
+        startPage();
+        List<SysUser> sysUsers = teamService.selectAssignUserList(teamId, user);
+        return getDataTable(sysUsers);
+    }
+    /**
+     * 查询目前没有被分配到该团队的成员
+     */
+    @RequiresPermissions("manager:team:query")
+    @GetMapping("/unassignUser/{teamId}")
+    public TableDataInfo selectUnassignUserList(SysUser user, @PathVariable("teamId") Long teamId){
+        startPage();
+        List<SysUser> sysUsers = teamService.selectUnassignUserList(teamId, user);
+        return getDataTable(sysUsers);
+    }
+    @RequiresPermissions("manager:team:edit")
+    @PutMapping("/assignUser/selectAll")
+    public AjaxResult selectAssignUserAll(Long teamId, Long[] userIds)
+    {
+
+        return toAjax(teamService.insertAssignUsers(teamId, userIds));
+    }
+    @RequiresPermissions("manager:team:edit")
+    @PutMapping("/assignUser/cancel")
+    public AjaxResult cancelAssignUser(@RequestBody TeamUser teamUser)
+    {
+        return toAjax(teamService.deleteAssignUser(teamUser));
+    }
+    @RequiresPermissions("system:team:edit")
+    @PutMapping("/assignUser/cancelAll")
+    public AjaxResult cancelAssignUserAll(Long teamId, Long[] userIds)
+    {
+        return toAjax(teamService.deleteAssignUsers(teamId, userIds));
     }
 }

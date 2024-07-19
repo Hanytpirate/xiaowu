@@ -1,9 +1,11 @@
 # Tomcat
 server:
   port: 9201
-
+#logging:
+#  level:
+#    com.ruoyi.system.mapper : debug
 # Spring
-spring: 
+spring:
   application:
     # 应用名称
     name: ruoyi-system

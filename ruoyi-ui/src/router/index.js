@@ -161,6 +161,19 @@ export const dynamicRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
     ]
+  },{
+    path: '/system/team-assign',
+    component: Layout,
+    hidden: true,
+    permissions: ['manager:team:edit'],
+    children: [
+      {
+        path: 'user/:teamId(\\d+)',
+        component: () => import('@/views/manager/team/assignUser.vue'),
+        name: 'assignUser',
+        meta: { title: '添加团队成员', activeMenu: '/manager/team' }
+      }
+    ]
   }
 ]
 

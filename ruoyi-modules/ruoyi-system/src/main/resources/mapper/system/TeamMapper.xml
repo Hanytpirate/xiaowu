@@ -2,8 +2,8 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.manager.mapper.TeamMapper">
-    
+<mapper namespace="com.ruoyi.system.mapper.TeamMapper">
+
     <resultMap type="Team" id="TeamResult">
         <result property="teamId"    column="team_id"    />
         <result property="leaderUid"    column="leader_uid"    />
@@ -11,25 +11,56 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="remark"    column="remark"    />
     </resultMap>
-
+    <resultMap type="SysUser" id="UserResult">
+        <id     property="userId"       column="user_id"      />
+        <result property="userName"     column="user_name"    />
+        <result property="nickName"     column="nick_name"    />
+        <result property="email"        column="email"        />
+        <result property="phonenumber"  column="phonenumber"  />
+        <result property="sex"          column="sex"          />
+        <result property="avatar"       column="avatar"       />
+        <result property="status"       column="status"       />
+        <result property="delFlag"      column="del_flag"     />
+    </resultMap>
     <sql id="selectTeamVo">
-        select team_id, leader_uid, team_name, create_time, remark from xiaowu_team
+        select t.team_id, t.leader_uid, t.team_name, t.create_time, t.remark
+        from xiaowu_team t
     </sql>
 
     <select id="selectTeamList" parameterType="Team" resultMap="TeamResult">
         <include refid="selectTeamVo"/>
-        <where>  
-            <if test="teamId != null "> and team_id = #{teamId}</if>
-            <if test="leaderUid != null "> and leader_uid = #{leaderUid}</if>
-            <if test="teamName != null  and teamName != ''"> and team_name like concat('%', #{teamName}, '%')</if>
+        <where>
+            <if test="teamId != null "> and t.team_id = #{teamId}</if>
+            <if test="leaderUid != null "> and t.leader_uid = #{leaderUid}</if>
+            <if test="teamName != null  and teamName != ''"> and t.team_name like concat('%', #{teamName}, '%')</if>
+            ${params.dataScope}
         </where>
     </select>
-    
-    <select id="selectTeamByTeamId" parameterType="Long" resultMap="TeamResult">
-        <include refid="selectTeamVo"/>
-        where team_id = #{teamId}
-    </select>
 
+    <select id="selectTeamByTeamId" parameterType="Team" resultMap="TeamResult">
+        <include refid="selectTeamVo"/>
+        where t.team_id = #{teamId}
+        ${params.dataScope}
+    </select>
+    <select id="selectTeamUserList" parameterType="Map" resultMap="UserResult">
+        SELECT user_id, user_name, nick_name, email, phonenumber, sex,avatar, STATUS, del_flag
+        FROM sys_user
+        WHERE
+            user_id <if test="unassign">NOT</if> IN (
+                SELECT
+                    user_id
+                FROM
+                    xiaowu_team_user
+                WHERE
+                    team_id = #{teamId}
+                )
+            <if test="sysUser.userName != null and sysUser.userName != ''">
+                AND user_name like concat('%', #{sysUser.userName}, '%')
+            </if>
+            <if test="sysUser.phonenumber != null and sysUser.phonenumber != ''">
+                AND phonenumber like concat('%', #{sysUser.phonenumber}, '%')
+            </if>
+    </select>
     <insert id="insertTeam" parameterType="Team" useGeneratedKeys="true" keyProperty="teamId">
         insert into xiaowu_team
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -37,7 +68,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="teamName != null">team_name,</if>
             <if test="createTime != null">create_time,</if>
             <if test="remark != null">remark,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="leaderUid != null">#{leaderUid},</if>
             <if test="teamName != null">#{teamName},</if>
@@ -62,9 +93,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTeamByTeamIds" parameterType="String">
-        delete from xiaowu_team where team_id in 
+        delete from xiaowu_team where team_id in
         <foreach item="teamId" collection="array" open="(" separator="," close=")">
             #{teamId}
         </foreach>
     </delete>
+
 </mapper>

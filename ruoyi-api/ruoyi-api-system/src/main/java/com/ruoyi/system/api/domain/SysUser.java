@@ -14,7 +14,7 @@ import com.ruoyi.common.core.xss.Xss;
 
 /**
  * 用户对象 sys_user
- * 
+ *
  * @author ruoyi
  */
 public class SysUser extends BaseEntity
@@ -88,6 +88,7 @@ public class SysUser extends BaseEntity
 
     /** 角色ID */
     private Long roleId;
+
 
     public SysUser()
     {

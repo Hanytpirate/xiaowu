@@ -5,16 +5,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.ruoyi.common.security.annotation.EnableCustomConfig;
 import com.ruoyi.common.security.annotation.EnableRyFeignClients;
 import com.ruoyi.common.swagger.annotation.EnableCustomSwagger2;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * 系统模块
- * 
+ *
  * @author ruoyi
  */
 @EnableCustomConfig
 @EnableCustomSwagger2
 @EnableRyFeignClients
 @SpringBootApplication
+@EnableAspectJAutoProxy(exposeProxy = true)
 public class RuoYiSystemApplication
 {
     public static void main(String[] args)
