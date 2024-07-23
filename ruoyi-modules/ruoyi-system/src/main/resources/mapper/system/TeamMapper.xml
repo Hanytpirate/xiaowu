@@ -42,6 +42,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where t.team_id = #{teamId}
         ${params.dataScope}
     </select>
+    <!--  根据用户id查询用户所属的团队列表  -->
+    <select id="selectTeamListByUserId" parameterType="Long" resultMap="TeamResult">
+        select team_id, leader_uid, team_name, create_time, remark
+        FROM xiaowu_team
+        WHERE team_id IN (
+            SELECT
+                team_id
+            FROM
+                xiaowu_team_user
+            WHERE
+                user_id = #{userId}
+            )
+    </select>
+    <!--  根据团队id查询团队成员 另外提供用户名 电话号码作为筛选条件  -->
     <select id="selectTeamUserList" parameterType="Map" resultMap="UserResult">
         SELECT user_id, user_name, nick_name, email, phonenumber, sex,avatar, STATUS, del_flag
         FROM sys_user

@@ -78,5 +78,5 @@ public interface ITeamService
     public int deleteAssignUser(TeamUser teamUser);
 
     public int deleteAssignUsers(Long teamId, Long[] userIds);
-
+    public List<Team> selectTeamListByUserId(Long userId);
 }

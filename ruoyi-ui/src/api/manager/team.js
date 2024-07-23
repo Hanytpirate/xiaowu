@@ -85,3 +85,11 @@ export function assignUserCancelAll(data) {
     params: data
   })
 }
+// 
+export function listByUserId(data) {
+  return request({
+    url: '/system/team/UserTeam',
+    method: 'get',
+    params: data
+  })
+}

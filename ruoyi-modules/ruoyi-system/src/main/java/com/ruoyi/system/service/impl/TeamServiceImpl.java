@@ -3,11 +3,8 @@ package com.ruoyi.system.service.impl;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.DateUtils;
 
-import com.ruoyi.common.core.utils.SpringUtils;
-import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.datascope.annotation.MyDataScope;
 import com.ruoyi.common.security.utils.SecurityUtils;
-import com.ruoyi.system.api.domain.SysRole;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.domain.Team;
 import com.ruoyi.system.api.model.LoginUser;
@@ -181,6 +178,11 @@ public class TeamServiceImpl implements ITeamService
     @Override
     public int deleteAssignUsers(Long teamId, Long[] userIds) {
         return teamUserMapper.deleteTeamUsers(teamId,userIds);
+    }
+
+    @Override
+    public List<Team> selectTeamListByUserId(Long userId) {
+        return teamMapper.selectTeamListByUserId(userId);
     }
 
     private int batchInsertTeamUser(List<TeamUser> teamUserList) {

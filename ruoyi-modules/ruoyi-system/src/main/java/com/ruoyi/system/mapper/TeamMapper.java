@@ -66,4 +66,5 @@ public interface TeamMapper
      * 查询已经加入到团队中的用户
      */
     public List<SysUser> selectTeamUserList(@Param("teamId")Long teamId, @Param("sysUser")SysUser sysUser,@Param("unassign")Boolean unassign);
+    public List<Team> selectTeamListByUserId(Long userId);
 }

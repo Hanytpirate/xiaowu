@@ -138,4 +138,11 @@ public class TeamController extends BaseController
     {
         return toAjax(teamService.deleteAssignUsers(teamId, userIds));
     }
+    @RequiresPermissions("manager:team:list")
+    @GetMapping("/UserTeam")
+    public TableDataInfo selectTeamListByUserId(Long userId)
+    {
+        List<Team> teams = teamService.selectTeamListByUserId(userId);
+        return getDataTable(teams);
+    }
 }
